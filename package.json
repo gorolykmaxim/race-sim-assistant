@@ -1,0 +1,22 @@
+{
+  "name": "race-sim-launcher",
+  "version": "1.0.0",
+  "description": "Single launcher for multiple race sim games aiming to improve single-player racing experience",
+  "main": "init-race-sim.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gorolykmaxim/race-sim-launcher.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gorolykmaxim/race-sim-launcher/issues"
+  },
+  "homepage": "https://github.com/gorolykmaxim/race-sim-launcher#readme",
+  "devDependencies": {
+    "@types/node": "^22.15.17"
+  }
+}
