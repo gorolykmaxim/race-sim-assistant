@@ -1,4 +1,5 @@
 const os = require("node:os");
+const process = require("node:process");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 
@@ -23,7 +24,7 @@ async function initAcc(hourOfDay, weatherGradient) {
     menuSettings.weatherType = "Custom";
     const customRace = menuSettings.seasonRaceEventData?.Free?.raceEventData?.CustomRace;
     if (customRace) {
-        console.log(`Time of day: ${hourOfDay}:00`);
+        console.log(`ACC time of day: ${hourOfDay}:00`);
         customRace.p1_TimeOfDay = hourOfDay;
         customRace.q_TimeOfDay = hourOfDay;
         customRace.r1_TimeOfDay = hourOfDay;
@@ -125,6 +126,126 @@ async function initAcc(hourOfDay, weatherGradient) {
     await writeConfigFile(path.join(configRootPath, "trackStatus.json"), track);
 }
 
+function calculateLmuSky(weatherGradient) {
+    if (weatherGradient < 0.1) {
+        console.log("LMU weather: clear");
+        return 0;
+    } else if (weatherGradient < 0.2) {
+        console.log("LMU weather: light clouds");
+        return 1;
+    } else if (weatherGradient < 0.3) {
+        console.log("LMU weather: partially cloudy");
+        return 2;
+    } else if (weatherGradient < 0.4) {
+        console.log("LMU weather: mostly cloudy");
+        return 3;
+    } else if (weatherGradient < 0.5) {
+        console.log("LMU weather: overcast");
+        return 4;
+    } else if (weatherGradient < 0.58) {
+        console.log("LMU weather: cloudy & drizzle");
+        return 5;
+    } else if (weatherGradient < 0.66) {
+        console.log("LMU weather: cloudy & light rain");
+        return 6;
+    } else if (weatherGradient < 0.74) {
+        console.log("LMU weather: overcast & light rain");
+        return 7;
+    } else if (weatherGradient < 0.82) {
+        console.log("LMU weather: overcast & rain");
+        return 8;
+    } else if (weatherGradient < 0.90) {
+        console.log("LMU weather: overcast & heavy rain");
+        return 9;
+    } else {
+        console.log("LMU weather: overcast & storm");
+        return 10;
+    }
+}
+
+function createLmuWeather(i, sky, weatherGradient) {
+    const duration = 30;
+    return {
+        "Duration": duration,
+        "Humidity": Math.round(60 + weatherGradient * 30),
+        "RainChance": Math.round(weatherGradient < 0.5 ? 0 : 70 + (weatherGradient - 0.5) * 60),
+        "Sky": sky,
+        "StartTime": 540 + i * duration,
+        "Temperature": Math.round(30 - weatherGradient * 10),
+        "WindDirection": 2,
+        "WindSpeed": Math.round(Math.random() * 14)
+    };
+}
+
+function createLmuSessionWeather(sky, weatherGradient, realRoadPreset) {
+    const weather = [];
+    for (let i = 0; i < 5; i++) {
+        weather.push(createLmuWeather(i, sky, weatherGradient));
+    }
+    return {
+        "Road": {
+            "LoadTemperaturesFromRealRoadFile": false,
+            "RealRoad": `preset:${realRoadPreset}.RRBIN`,
+            "WaterDepth": weatherGradient < 0.5 ? 0 : weatherGradient * 0.75
+        },
+        "Weather": weather
+    };
+}
+
+async function initLmu(hourOfDay, weatherGradient) {
+    const configRootPath = path.join(
+        process.env["ProgramFiles(x86)"],
+        "Steam",
+        "steamapps",
+        "common",
+        "Le Mans Ultimate",
+        "UserData",
+        "player"
+    );
+    const settingsPath = path.join(configRootPath, "Settings.json");
+    const settings = await readConfigFile(settingsPath);
+    const raceConditions = settings['Race Conditions'];
+    if (raceConditions) {
+        let minutesSinceMidnight;
+        if (Math.random() < 0.5) {
+            minutesSinceMidnight = hourOfDay * 60 + 30;
+            console.log(`LMU time of day: ${hourOfDay}:30`);
+        } else {
+            minutesSinceMidnight = hourOfDay * 60;
+            console.log(`LMU time of day: ${hourOfDay}:00`);
+        }
+        raceConditions['Practice1StartingTime'] = minutesSinceMidnight;
+        raceConditions['QualifyingStartingTime'] = minutesSinceMidnight;
+        raceConditions['RaceStartingTime'] = minutesSinceMidnight;
+    }
+    await writeConfigFile(settingsPath, settings);
+    const trackWeather = {};
+    const sky = calculateLmuSky(weatherGradient);
+    trackWeather["Practice"] = createLmuSessionWeather(sky, weatherGradient, "LIGHT");
+    trackWeather["Qualifying"] = createLmuSessionWeather(sky, weatherGradient, "MEDIUM");
+    trackWeather["Race"] = createLmuSessionWeather(sky, weatherGradient, "HEAVY");
+    const weatherRootPath = path.join(configRootPath, "Settings");
+    await writeConfigFile(path.join(weatherRootPath, "Bahrain", "BAHRAINWEC_ENDCEs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Bahrain", "BAHRAINWEC_OUTERs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Bahrain", "BAHRAINWEC_PADDOCKs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Bahrain", "BAHRAINWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Circuit Of The Americas", "COTAWEC_NATIONALs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Circuit Of The Americas", "COTAWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Fuji", "FUJIWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Fuji_Cl", "FUJIWEC_CLs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Imola", "IMOLAWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Interlagos", "INTERLAGOSWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Lemans", "LEMANSWEC_MULSANNEs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Lemans", "LEMANSWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Monza", "MONZAWEC_GRANDEs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Monza", "MONZAWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Portimao", "PORTIMAOWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Sebring", "SEBRINGWEC_SCHOOLs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Sebring", "SEBRINGWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Spa", "SPAWECs.wet"), trackWeather);
+    await writeConfigFile(path.join(weatherRootPath, "Spa_Endce", "SPAWEC_ENDCEs.wet"), trackWeather);
+}
+
 function pickHourOfDay() {
     if (Math.random() < 0.2) {
         // Pick hour any time of day or night
@@ -151,6 +272,7 @@ async function main() {
     const hourOfDay = pickHourOfDay();
     const weatherGradient = pickWeatherGradient();
     await initAcc(hourOfDay, weatherGradient);
+    await initLmu(hourOfDay, weatherGradient);
 }
 
 main();
