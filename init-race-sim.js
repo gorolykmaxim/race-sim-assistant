@@ -17,6 +17,63 @@ async function writeConfigFile(path, obj) {
     await fs.writeFile(path, JSON.stringify(obj));
 }
 
+function calculateTemperature(weatherGradient) {
+    return Math.round(30 - weatherGradient * 10);
+}
+
+async function initAc(hourOfDay, weatherGradient) {
+    const secondsInHour = 3600;
+    const configRootPath = path.join(
+        process.env.LOCALAPPDATA,
+        "AcTools Content Manager",
+        "Presets",
+        "Quick Drive"
+    );
+    const temperature = calculateTemperature(weatherGradient);
+    const secondsOfCurrentHour = Math.round(Math.random() * secondsInHour);
+    const timeOfDayInSeconds = hourOfDay * secondsInHour + secondsOfCurrentHour;
+    console.log(`AC time of day: ${hourOfDay}:${Math.round(secondsOfCurrentHour / 60).toString().padStart(2, "0")}`);
+    let weatherId;
+    if (weatherGradient < 0.1) {
+        weatherId = "*15";
+        console.log("AC weather: clear");
+    } else if (weatherGradient < 0.2) {
+        weatherId = "*16";
+        console.log("AC weather: few clouds");
+    } else if (weatherGradient < 0.3) {
+        weatherId = "*17";
+        console.log("AC weather: scattered clouds");
+    } else if (weatherGradient < 0.4) {
+        weatherId = "*18";
+        console.log("AC weather: broken clouds");
+    } else if (weatherGradient < 0.5) {
+        weatherId = "*19";
+        console.log("AC weather: overcast clouds");
+    } else if (weatherGradient < 0.66) {
+        weatherId = "*6";
+        console.log("AC weather: light rain");
+    } else if (weatherGradient < 0.82) {
+        weatherId = "*7";
+        console.log("AC weather: rain");
+    } else {
+        weatherId = "*8";
+        console.log("AC weather: heavy rain");
+    }
+    for (const preset of ["imsa", "f1", "f2", "f3", "f4"]) {
+        try {
+            const presetPath = path.join(configRootPath, preset + ".cmpreset");
+            const presetData = await readConfigFile(presetPath);
+            presetData.Temperature = temperature;
+            presetData.Time = timeOfDayInSeconds;
+            presetData.WeatherId = weatherId;
+            await writeConfigFile(presetPath, presetData);
+        } catch (e) {
+            console.log(`Failed to initialize AC ${preset}`);
+            console.log(e);
+        }
+    }
+}
+
 async function initAcc(hourOfDay, weatherGradient) {
     try {
         const configRootPath = path.join(os.homedir(), "Documents", "Assetto Corsa Competizione", "Config");
@@ -176,7 +233,7 @@ function createLmuWeather(i, sky, weatherGradient) {
         "RainChance": Math.round(weatherGradient < 0.5 ? 0 : 70 + (weatherGradient - 0.5) * 60),
         "Sky": sky,
         "StartTime": 540 + i * duration,
-        "Temperature": Math.round(30 - weatherGradient * 10),
+        "Temperature": calculateTemperature(weatherGradient),
         "WindDirection": 2,
         "WindSpeed": Math.round(Math.random() * 14)
     };
@@ -281,6 +338,7 @@ function pickWeatherGradient() {
 async function main() {
     const hourOfDay = pickHourOfDay();
     const weatherGradient = pickWeatherGradient();
+    await initAc(hourOfDay, weatherGradient);
     await initAcc(hourOfDay, weatherGradient);
     await initLmu(hourOfDay, weatherGradient);
 }
