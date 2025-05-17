@@ -21,8 +21,7 @@ function calculateTemperature(weatherGradient) {
     return Math.round(30 - weatherGradient * 10);
 }
 
-async function initAc(hourOfDay, weatherGradient) {
-    const secondsInHour = 3600;
+async function initAc(timeOfDayInMinutes, weatherGradient) {
     const configRootPath = path.join(
         process.env.LOCALAPPDATA,
         "AcTools Content Manager",
@@ -30,9 +29,10 @@ async function initAc(hourOfDay, weatherGradient) {
         "Quick Drive"
     );
     const temperature = calculateTemperature(weatherGradient);
-    const secondsOfCurrentHour = Math.round(Math.random() * secondsInHour);
-    const timeOfDayInSeconds = hourOfDay * secondsInHour + secondsOfCurrentHour;
-    console.log(`AC time of day: ${hourOfDay}:${Math.round(secondsOfCurrentHour / 60).toString().padStart(2, "0")}`);
+    const timeOfDayInSeconds = timeOfDayInMinutes * 60;
+    const hours = Math.floor(timeOfDayInMinutes / 60);
+    const minutes = timeOfDayInMinutes % 60;
+    console.log(`AC time of day: ${hours}:${minutes.toString().padStart(2, "0")}`);
     let weatherId;
     if (weatherGradient < 0.1) {
         weatherId = "*15";
@@ -74,7 +74,7 @@ async function initAc(hourOfDay, weatherGradient) {
     }
 }
 
-async function initAcc(hourOfDay, weatherGradient) {
+async function initAcc(timeOfDayInMinutes, weatherGradient) {
     try {
         const configRootPath = path.join(os.homedir(), "Documents", "Assetto Corsa Competizione", "Config");
         const menuSettingsPath = path.join(configRootPath, "menuSettings.json");
@@ -82,6 +82,7 @@ async function initAcc(hourOfDay, weatherGradient) {
         menuSettings.weatherType = "Custom";
         const customRace = menuSettings.seasonRaceEventData?.Free?.raceEventData?.CustomRace;
         if (customRace) {
+            const hourOfDay = Math.floor(timeOfDayInMinutes / 60);
             console.log(`ACC time of day: ${hourOfDay}:00`);
             customRace.p1_TimeOfDay = hourOfDay;
             customRace.q_TimeOfDay = hourOfDay;
@@ -254,7 +255,7 @@ function createLmuSessionWeather(sky, weatherGradient, realRoadPreset) {
     };
 }
 
-async function initLmu(hourOfDay, weatherGradient) {
+async function initLmu(timeOfDayInMinutes, weatherGradient) {
     try {
         const configRootPath = path.join(
             process.env["ProgramFiles(x86)"],
@@ -269,17 +270,18 @@ async function initLmu(hourOfDay, weatherGradient) {
         const settings = await readConfigFile(settingsPath);
         const raceConditions = settings['Race Conditions'];
         if (raceConditions) {
-            let minutesSinceMidnight;
-            if (Math.random() < 0.5) {
-                minutesSinceMidnight = hourOfDay * 60 + 30;
-                console.log(`LMU time of day: ${hourOfDay}:30`);
+            const hours = Math.floor(timeOfDayInMinutes / 60);
+            const minutes = timeOfDayInMinutes % 60;
+            timeOfDayInMinutes -= minutes;
+            if (minutes > 30) {
+                timeOfDayInMinutes += 30;
+                console.log(`LMU time of day: ${hours}:30`);
             } else {
-                minutesSinceMidnight = hourOfDay * 60;
-                console.log(`LMU time of day: ${hourOfDay}:00`);
+                console.log(`LMU time of day: ${hours}:00`);
             }
-            raceConditions['Practice1StartingTime'] = minutesSinceMidnight;
-            raceConditions['QualifyingStartingTime'] = minutesSinceMidnight;
-            raceConditions['RaceStartingTime'] = minutesSinceMidnight;
+            raceConditions['Practice1StartingTime'] = timeOfDayInMinutes;
+            raceConditions['QualifyingStartingTime'] = timeOfDayInMinutes;
+            raceConditions['RaceStartingTime'] = timeOfDayInMinutes;
         }
         await writeConfigFile(settingsPath, settings);
         const trackWeather = {};
@@ -313,13 +315,13 @@ async function initLmu(hourOfDay, weatherGradient) {
     }
 }
 
-function pickHourOfDay() {
+function pickTimeOfDayInMinutes() {
     if (Math.random() < 0.2) {
-        // Pick hour any time of day or night
-        return Math.round(Math.random() * 24);
+        // Pick time of day or night
+        return Math.round(Math.random() * 24 * 60);
     } else {
-        // Pick hour from 9:00 to 21:00
-        return 9 + Math.round(Math.random() * 12);
+        // Pick time from 9:00 to 21:00
+        return 9 + Math.round(Math.random() * 12 * 60);
     }
 }
 
@@ -336,11 +338,11 @@ function pickWeatherGradient() {
 }
 
 async function main() {
-    const hourOfDay = pickHourOfDay();
+    const timeOfDayInMinutes = pickTimeOfDayInMinutes();
     const weatherGradient = pickWeatherGradient();
-    await initAc(hourOfDay, weatherGradient);
-    await initAcc(hourOfDay, weatherGradient);
-    await initLmu(hourOfDay, weatherGradient);
+    await initAc(timeOfDayInMinutes, weatherGradient);
+    await initAcc(timeOfDayInMinutes, weatherGradient);
+    await initLmu(timeOfDayInMinutes, weatherGradient);
 }
 
 main();
