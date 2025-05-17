@@ -3,6 +3,8 @@ const process = require("node:process");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 
+let CURRENT_INIT_PROMISE = null;
+
 async function readConfigFile(path) {
     const configData = await fs.readFile(path, {encoding: "utf8"});
     return JSON.parse(configData);
@@ -337,12 +339,18 @@ function pickWeatherGradient() {
     }
 }
 
-async function main() {
+export async function initTimeOfDayAndWeatherInAllSims() {
     const timeOfDayInMinutes = pickTimeOfDayInMinutes();
     const weatherGradient = pickWeatherGradient();
-    await initAc(timeOfDayInMinutes, weatherGradient);
-    await initAcc(timeOfDayInMinutes, weatherGradient);
-    await initLmu(timeOfDayInMinutes, weatherGradient);
+    if (CURRENT_INIT_PROMISE) {
+        await CURRENT_INIT_PROMISE;
+    }
+    CURRENT_INIT_PROMISE = Promise.all([
+        initAc(timeOfDayInMinutes, weatherGradient),
+        initAcc(timeOfDayInMinutes, weatherGradient),
+        initLmu(timeOfDayInMinutes, weatherGradient)
+    ]);
+    await CURRENT_INIT_PROMISE;
+    CURRENT_INIT_PROMISE = null;
+    return {timeOfDayInMinutes, weatherGradient};
 }
-
-main();
