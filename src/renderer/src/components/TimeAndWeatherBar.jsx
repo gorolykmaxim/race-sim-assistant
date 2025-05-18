@@ -2,10 +2,25 @@ import {useEffect, useState} from "react";
 
 export default function TimeAndWeatherBar({}) {
     const [timeAndWeather, setTimeAndWeather] = useState();
-    const initTimeAndWeather = async () => setTimeAndWeather(await api.initTimeOfDayAndWeatherInAllSims());
+
+    async function refreshTimeAndWeather() {
+        const newTimeAndWeather = await api.initTimeOfDayAndWeatherInAllSims();
+        localStorage.setItem("timeAndWeather", JSON.stringify(newTimeAndWeather));
+        setTimeAndWeather(newTimeAndWeather);
+    }
+
+    async function initTimeAndWeatherOnStart() {
+        const savedTimeAndWeather = localStorage.getItem("timeAndWeather");
+        if (savedTimeAndWeather) {
+            setTimeAndWeather(JSON.parse(savedTimeAndWeather));
+        } else {
+            await refreshTimeAndWeather();
+        }
+    }
+
     useEffect(
         () => {
-            initTimeAndWeather();
+            initTimeAndWeatherOnStart()
         },
         []
     );
@@ -31,7 +46,10 @@ export default function TimeAndWeatherBar({}) {
         <div className={"d-flex justify-content-end align-items-center"}>
             <i className={`me-2 bi bi-${weatherIcon}`} style={{fontSize: "1.5 rem"}}></i>
             <span className={"me-3"}>{time}</span>
-            <button type={"button"} className={"btn btn-sm btn-outline-secondary"} onClick={initTimeAndWeather}>Refresh</button>
+            <button type={"button"} className={"btn btn-sm btn-outline-secondary"}
+                    onClick={refreshTimeAndWeather}>
+                Refresh
+            </button>
         </div>
     </div>;
 }
