@@ -5,8 +5,8 @@ import {initTimeOfDayAndWeatherInAllSims} from "./race-sim-init";
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
-        width: 900,
-        height: 670,
+        width: 190,
+        height: 90,
         show: false,
         autoHideMenuBar: true,
         webPreferences: {
