@@ -323,7 +323,7 @@ function pickTimeOfDayInMinutes() {
         return Math.round(Math.random() * 24 * 60);
     } else {
         // Pick time from 9:00 to 21:00
-        return 9 + Math.round(Math.random() * 12 * 60);
+        return Math.round((9 + Math.random() * 12) * 60);
     }
 }
 
