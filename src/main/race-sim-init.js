@@ -23,6 +23,12 @@ function calculateTemperature(weatherGradient) {
     return Math.round(30 - weatherGradient * 10);
 }
 
+function timeOfDayInMinutesToString(timeOfDayInMinutes) {
+    const hours = Math.floor(timeOfDayInMinutes / 60);
+    const minutes = timeOfDayInMinutes % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
+
 async function initAc(timeOfDayInMinutes, weatherGradient) {
     const configRootPath = path.join(
         process.env.LOCALAPPDATA,
@@ -32,9 +38,7 @@ async function initAc(timeOfDayInMinutes, weatherGradient) {
     );
     const temperature = calculateTemperature(weatherGradient);
     const timeOfDayInSeconds = timeOfDayInMinutes * 60;
-    const hours = Math.floor(timeOfDayInMinutes / 60);
-    const minutes = timeOfDayInMinutes % 60;
-    console.log(`AC time of day: ${hours}:${minutes.toString().padStart(2, "0")}`);
+    console.log(`AC time of day: ${timeOfDayInMinutesToString(timeOfDayInMinutes)}`);
     let weatherId;
     if (weatherGradient < 0.1) {
         weatherId = "*15";
@@ -270,7 +274,7 @@ async function initLmu(timeOfDayInMinutes, weatherGradient) {
         );
         const settingsPath = path.join(configRootPath, "Settings.json");
         const settings = await readConfigFile(settingsPath);
-        const raceConditions = settings['Race Conditions'];
+        const raceConditions = settings["Race Conditions"];
         if (raceConditions) {
             const hours = Math.floor(timeOfDayInMinutes / 60);
             const minutes = timeOfDayInMinutes % 60;
@@ -281,9 +285,9 @@ async function initLmu(timeOfDayInMinutes, weatherGradient) {
             } else {
                 console.log(`LMU time of day: ${hours}:00`);
             }
-            raceConditions['Practice1StartingTime'] = timeOfDayInMinutes;
-            raceConditions['QualifyingStartingTime'] = timeOfDayInMinutes;
-            raceConditions['RaceStartingTime'] = timeOfDayInMinutes;
+            raceConditions["Practice1StartingTime"] = timeOfDayInMinutes;
+            raceConditions["QualifyingStartingTime"] = timeOfDayInMinutes;
+            raceConditions["RaceStartingTime"] = timeOfDayInMinutes;
         }
         await writeConfigFile(settingsPath, settings);
         const trackWeather = {};
@@ -313,6 +317,54 @@ async function initLmu(timeOfDayInMinutes, weatherGradient) {
         await writeConfigFile(path.join(weatherRootPath, "Spa_Endce", "SPAWEC_ENDCEs.wet"), trackWeather);
     } catch (e) {
         console.log("Failed to initialize LMU");
+        console.log(e);
+    }
+}
+
+async function initRf2(timeOfDayInMinutes, weatherGradient) {
+    try {
+        const playerPath = path.join(
+            process.env["ProgramFiles(x86)"],
+            "Steam",
+            "steamapps",
+            "common",
+            "rFactor 2",
+            "UserData",
+            "player",
+            "player.JSON" // RF2 expects file extension to be upper case
+        );
+        const player = await readConfigFile(playerPath);
+        const raceConditions = player["Race Conditions"];
+        if (raceConditions) {
+            console.log(`RF2 time of day: ${timeOfDayInMinutesToString(timeOfDayInMinutes)}`);
+            raceConditions["CURNT RaceStartingTime"] = timeOfDayInMinutes;
+            raceConditions["GPRIX RaceStartingTime"] = timeOfDayInMinutes;
+            raceConditions["Practice1StartingTime"] = timeOfDayInMinutes;
+            raceConditions["CHAMP RaceStartingTime"] = timeOfDayInMinutes;
+            raceConditions["MULTI RaceStartingTime"] = timeOfDayInMinutes;
+            raceConditions["QualifyingStartingTime"] = timeOfDayInMinutes;
+            raceConditions["RPLAY RaceStartingTime"] = timeOfDayInMinutes;
+            raceConditions["WarmupStartingTime"] = timeOfDayInMinutes;
+            let weather;
+            if (weatherGradient < 0.25) {
+                console.log("RF2 weather: sun");
+                weather = 0;
+            } else if (weatherGradient < 0.5) {
+                console.log("RF2 weather: clouds");
+                weather = 1;
+            } else {
+                console.log("RF2 weather: rain");
+                weather = 2;
+            }
+            raceConditions["CURNT Weather"] = weather;
+            raceConditions["GPRIX Weather"] = weather;
+            raceConditions["CHAMP Weather"] = weather;
+            raceConditions["MULTI Weather"] = weather;
+            raceConditions["RPLAY Weather"] = weather;
+        }
+        await writeConfigFile(playerPath, player);
+    } catch (e) {
+        console.log("Failed to initialize RF2");
         console.log(e);
     }
 }
@@ -348,7 +400,8 @@ export async function initTimeOfDayAndWeatherInAllSims() {
     CURRENT_INIT_PROMISE = Promise.all([
         initAc(timeOfDayInMinutes, weatherGradient),
         initAcc(timeOfDayInMinutes, weatherGradient),
-        initLmu(timeOfDayInMinutes, weatherGradient)
+        initLmu(timeOfDayInMinutes, weatherGradient),
+        initRf2(timeOfDayInMinutes, weatherGradient)
     ]);
     await CURRENT_INIT_PROMISE;
     CURRENT_INIT_PROMISE = null;
