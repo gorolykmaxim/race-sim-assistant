@@ -13,6 +13,15 @@ function Race({name, logoImageUrl, trackName}) {
 
 function GameSchedule({logoImageUrl, races}) {
     let cards = [];
+    races.sort((r1, r2) => {
+        if (r1.name < r2.name) {
+            return -1;
+        } else if (r1.name === r2.name) {
+            return 0;
+        } else {
+            return 1;
+        }
+    });
     for (const race of races) {
         cards.push(
             <div key={race.name} className={"col"}>
