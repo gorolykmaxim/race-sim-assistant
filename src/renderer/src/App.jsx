@@ -4,7 +4,7 @@ import RaceSchedule from "./components/RaceSchedule";
 export default function App() {
     return (
         <>
-            <div className="container">
+            <div className="container pb-4">
                 <TimeAndWeatherBar/>
                 <RaceSchedule/>
             </div>
