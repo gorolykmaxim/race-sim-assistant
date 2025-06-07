@@ -51,7 +51,21 @@ export default function RaceSchedule() {
     const [schedules, setSchedules] = useState(null);
 
     async function init() {
-        setSchedules(await api.fetchRaceSchedule());
+        const CACHE_TTL_MS = 2 * 60 * 60 * 1000;
+        let raceSchedule = localStorage.getItem("raceSchedule");
+        if (raceSchedule) {
+            raceSchedule = JSON.parse(raceSchedule);
+            if (Date.now() - raceSchedule.timestamp < CACHE_TTL_MS) {
+                setSchedules(raceSchedule.schedules);
+                return;
+            }
+        }
+        raceSchedule = {
+            schedules: await api.fetchRaceSchedule(),
+            timestamp: Date.now(),
+        };
+        localStorage.setItem("raceSchedule", JSON.stringify(raceSchedule));
+        setSchedules(raceSchedule.schedules);
     }
 
     useEffect(() => {
