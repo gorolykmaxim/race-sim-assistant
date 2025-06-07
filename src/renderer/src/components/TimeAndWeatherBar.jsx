@@ -42,7 +42,7 @@ export default function TimeAndWeatherBar({}) {
             weatherIcon = "cloud-lightning-rain";
         }
     }
-    return <div className={"row py-2"}>
+    return <div className={"row py-2 sticky-top bg-body"}>
         <div className={"d-flex justify-content-end align-items-center"}>
             <i className={`me-2 bi bi-${weatherIcon}`} style={{fontSize: "1.5 rem"}}></i>
             <span className={"me-3"}>{time}</span>
