@@ -44,7 +44,7 @@ async function fetchLFMRaceSchedule() {
         const GT4_CLASS = 1;
         const tracks = [new Set(), new Set()];
         for (const series of accSeries["series"]) {
-            if (series["race_length"] > 30) {
+            if (series["event_style"] !== "daily") {
                 continue;
             }
             const name = series["series_name"];
