@@ -48,8 +48,8 @@ function Race({raceSimLogo, tracks}) {
 
 export default function RaceSchedule() {
     return <div className={"row row-cols-3 g-4"}>
-        <Race raceSimLogo={ACCLogo} tracks={TracksACC}/>
         <Race raceSimLogo={LMULogo} tracks={TracksLMU}/>
+        <Race raceSimLogo={ACCLogo} tracks={TracksACC}/>
         <Race raceSimLogo={RF2Logo} tracks={TracksRF2}/>
     </div>;
 }
