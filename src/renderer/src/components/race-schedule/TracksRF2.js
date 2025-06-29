@@ -12,7 +12,7 @@ export default [
     {
         name: "Atlanta Motorsports Park",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Atlanta Motorsports Park.jpg", import.meta.url).href,
-        layouts: ["AtlantaMP - Kart Layout A", "AtlantaMP - Kart Layout B", "AtlantaMP - Kart Layout B+", "AtlantaMP - Kart Layout C", "AtlantaMP - Race Track"]
+        layouts: ["AtlantaMP - Race Track", "AtlantaMP - Kart Layout A", "AtlantaMP - Kart Layout B", "AtlantaMP - Kart Layout B+", "AtlantaMP - Kart Layout C"]
     },
     {
         name: "Autodrome of Portugal",
@@ -232,7 +232,7 @@ export default [
     {
         name: "Palm Beach International Raceway",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Palm Beach International Raceway.jpg", import.meta.url).href,
-        layouts: ["Palm Beach Intl Kart Track", "Palm Beach Intl Road Course"]
+        layouts: ["Palm Beach Intl Road Course", "Palm Beach Intl Kart Track"]
     },
     {
         name: "Portland International Raceway",
