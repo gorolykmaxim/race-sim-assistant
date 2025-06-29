@@ -1,5 +1,5 @@
 import TimeAndWeatherBar from "./components/TimeAndWeatherBar";
-import RaceSchedule from "./components/RaceSchedule";
+import RaceSchedule from "./components/race-schedule/RaceSchedule";
 
 export default function App() {
     return (

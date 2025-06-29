@@ -2,7 +2,6 @@ import {app, BrowserWindow, ipcMain, shell} from "electron"
 import {join} from "path"
 import {electronApp, is, optimizer} from "@electron-toolkit/utils"
 import {initTimeOfDayAndWeatherInAllSims} from "./race-sim-init";
-import {fetchRaceSchedule} from "./race-schedule";
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -46,7 +45,6 @@ app.whenReady().then(() => {
     });
 
     ipcMain.handle("race-sim-init:initTimeOfDayAndWeatherInAllSims", initTimeOfDayAndWeatherInAllSims);
-    ipcMain.handle("race-schedule:fetchRaceSchedule", fetchRaceSchedule);
 
     createWindow();
 

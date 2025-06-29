@@ -2,7 +2,6 @@ import {contextBridge, ipcRenderer} from "electron";
 
 const api = {
     initTimeOfDayAndWeatherInAllSims: () => ipcRenderer.invoke("race-sim-init:initTimeOfDayAndWeatherInAllSims"),
-    fetchRaceSchedule: () => ipcRenderer.invoke("race-schedule:fetchRaceSchedule"),
 };
 
 if (process.contextIsolated) {
