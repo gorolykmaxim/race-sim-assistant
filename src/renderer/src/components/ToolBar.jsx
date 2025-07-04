@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-export default function TimeAndWeatherBar({}) {
+export default function ToolBar({onNotesClick}) {
     const [timeAndWeather, setTimeAndWeather] = useState();
 
     async function refreshTimeAndWeather() {
@@ -44,11 +44,13 @@ export default function TimeAndWeatherBar({}) {
     }
     return <div className={"row py-2 sticky-top bg-body"}>
         <div className={"d-flex justify-content-end align-items-center"}>
-            <i className={`me-2 bi bi-${weatherIcon}`} style={{fontSize: "1.5 rem"}}></i>
+            <button type={"button"} className={"btn btn-sm btn-outline-warning"} onClick={onNotesClick}>
+                <i className={"bi bi-sticky-fill"}/> Notes
+            </button>
+            <i className={`ms-3 me-2 bi bi-${weatherIcon}`} style={{fontSize: "1.5 rem"}}/>
             <span className={"me-3"}>{time}</span>
-            <button type={"button"} className={"btn btn-sm btn-outline-secondary"}
-                    onClick={refreshTimeAndWeather}>
-                Refresh
+            <button type={"button"} className={"btn btn-sm btn-outline-secondary"} onClick={refreshTimeAndWeather}>
+                <i className={"bi bi-arrow-clockwise"}/> Refresh
             </button>
         </div>
     </div>;
