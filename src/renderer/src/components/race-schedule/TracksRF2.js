@@ -25,6 +25,11 @@ export default [
         layouts: ["Bahrain", "Bahrain Endurance", "Bahrain Outer", "Bahrain Paddock"]
     },
     {
+        name: "Barcelona",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Barcelona.jpg", import.meta.url).href,
+        layouts: ["Barcelona 2021", "Barcelona 2023 (No Chicane)"]
+    },
+    {
         name: "Bathurst",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Bathurst.jpg", import.meta.url).href,
         layouts: ["Bathurst 2014"]
