@@ -49,7 +49,7 @@ function Race({raceSimLogo, tracks}) {
 export default function RaceSchedule({className}) {
     return <div className={`row row-cols-3 g-4 ${className || ""}`}>
         <Race raceSimLogo={LMULogo} tracks={TracksLMU}/>
-        <Race raceSimLogo={ACCLogo} tracks={TracksACC}/>
         <Race raceSimLogo={RF2Logo} tracks={TracksRF2}/>
+        <Race raceSimLogo={ACCLogo} tracks={TracksACC}/>
     </div>;
 }

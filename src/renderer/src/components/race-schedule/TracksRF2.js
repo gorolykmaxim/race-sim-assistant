@@ -110,6 +110,11 @@ export default [
         layouts: ["Hong Kong Formula E"]
     },
     {
+        name: "Hungaroring",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Hungaroring.jpg", import.meta.url).href,
+        layouts: ["Hungaroring 2018"]
+    },
+    {
         name: "Imola",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Imola.jpg", import.meta.url).href,
         layouts: ["Imola 2018", "Imola 2001", "Imola 1988", "Imola 1972"]
@@ -190,6 +195,11 @@ export default [
         layouts: ["Inner Loop A", "Inner Loop B", "Inner Loop C", "Outer Loop A", "Outer Loop B", "Outer Loop C"]
     },
     {
+        name: "Misano",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Misano.jpg", import.meta.url).href,
+        layouts: ["Misano World Circuit Grand Prix"]
+    },
+    {
         name: "Monte Carlo",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Monte Carlo.webp", import.meta.url).href,
         layouts: ["1966 Monte Carlo"]
@@ -232,7 +242,12 @@ export default [
     {
         name: "Nurburgring",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Nurburgring.jpg", import.meta.url).href,
-        layouts: ["Nurburgring - 24h", "Nurburgring - 24h Support", "Nurburgring - Combined", "Nurburgring - Endurance Series", "Nurburgring - Grand Prix", "Nurburgring - Grand Prix No Chicane", "Nurburgring - Nordschleife", "Nurburgring - Sprint", "Nurburgring - Sprint No Chicane"]
+        layouts: ["Nurburgring - Grand Prix", "Nurburgring - 24h", "Nurburgring - 24h Support", "Nurburgring - Combined", "Nurburgring - Endurance Series", "Nurburgring - Grand Prix No Chicane", "Nurburgring - Nordschleife", "Nurburgring - Sprint", "Nurburgring - Sprint No Chicane"]
+    },
+    {
+        name: "Oulton Park",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Oulton Park.jpg", import.meta.url).href,
+        layouts: ["Oulton Park International", "Oulton Park International NC", "Oulton Park International NC DRS", "Oulton Park Island", "Oulton Park Fosters"]
     },
     {
         name: "Palm Beach International Raceway",
@@ -248,6 +263,11 @@ export default [
         name: "Quebec Superkarts",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Quebec Superkarts.jpg", import.meta.url).href,
         layouts: ["Pro-Kart Championship - Round 1", "Pro-Kart Championship - Round 2", "Pro-Kart Championship - Round 3", "Pro-Kart Championship - Round 4"]
+    },
+    {
+        name: "Red Bull Ring",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Red Bull Ring.jpg", import.meta.url).href,
+        layouts: ["Red Bull Ring"]
     },
     {
         name: "Road America",
@@ -280,6 +300,11 @@ export default [
         layouts: ["Sebring - 12 Hour Road Course", "Sebring - Full Layout", "Sebring - Johnson Club", "Sebring - School"]
     },
     {
+        name: "Silverstone",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Silverstone.jpg", import.meta.url).href,
+        layouts: ["Silverstone Endurance", "Silverstone Grand Prix", "Silverstone Historic Chicane", "Silverstone International", "Silverstone National"]
+    },
+    {
         name: "Southshore",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Southshore.jpg", import.meta.url).href,
         layouts: ["Southshore GP", "Southshore GT"]
@@ -305,6 +330,11 @@ export default [
         layouts: ["Toban RP - Long", "Toban RP - Long Reverse", "Toban RP - Medium", "Toban RP - Medium Reverse", "Toban RP - Short", "Toban RP - Short Reverse"]
     },
     {
+        name: "Valencia",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Valencia.jpg", import.meta.url).href,
+        layouts: ["Valencia Circuit"]
+    },
+    {
         name: "Virginia International Raceway",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Virginia International Raceway.jpg", import.meta.url).href,
         layouts: ["VIR Full Course", "VIR Grand Course", "VIR North Course", "VIR Patriot Course", "VIR South Course"]
@@ -323,5 +353,10 @@ export default [
         name: "Zandvoort",
         thumbnail: new URL("../../assets/track-thumbnails/rf2/Zandvoort.jpg", import.meta.url).href,
         layouts: ["Zandvoort 2021", "Zandvoort 2021 National"]
+    },
+    {
+        name: "Zolder",
+        thumbnail: new URL("../../assets/track-thumbnails/rf2/Zolder.jpg", import.meta.url).href,
+        layouts: ["Zolder 2016"]
     }
 ]
