@@ -1,0 +1,15 @@
+.weekly-progression-step-icon {
+  font-size: 1.5rem;
+}
+
+.weekly-progression-step-icon-enabled {
+  cursor: pointer;
+}
+
+.weekly-progression-step-line {
+  min-width: 1px;
+  min-height: 1px;
+  flex: 1 0 32px;
+  margin: auto;
+  background-color: var(--bs-border-color);
+}

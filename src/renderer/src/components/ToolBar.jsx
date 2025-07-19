@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-export default function ToolBar({onNotesClick}) {
+export default function ToolBar({onNotesClick, onWeeklyProgressionClick}) {
     const [timeAndWeather, setTimeAndWeather] = useState();
 
     async function refreshTimeAndWeather() {
@@ -44,7 +44,10 @@ export default function ToolBar({onNotesClick}) {
     }
     return <div className={"row py-2 sticky-top bg-body"}>
         <div className={"d-flex justify-content-end align-items-center"}>
-            <button type={"button"} className={"btn btn-sm btn-outline-warning"} onClick={onNotesClick}>
+            <button type={"button"} className={"btn btn-sm btn-outline-success"} onClick={onWeeklyProgressionClick}>
+                <i className={"bi bi-trophy-fill"}/> Weekly Progression
+            </button>
+            <button type={"button"} className={"btn btn-sm btn-outline-warning ms-3"} onClick={onNotesClick}>
                 <i className={"bi bi-sticky-fill"}/> Notes
             </button>
             <i className={`ms-3 me-2 bi bi-${weatherIcon}`} style={{fontSize: "1.5 rem"}}/>
