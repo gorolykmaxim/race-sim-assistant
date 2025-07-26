@@ -88,9 +88,8 @@ export default function WeeklyProgression({className}) {
 }
 
 function WeeklyProgressionInternal({className, onEdit}) {
-    // TODO: create useProgressionTracker() similar to useProgressionEditor()
-    const [progressions] = useState(() => loadProgressions());
-    const [progress, setProgress] = useState(() => loadProgress());
+    const tracker = useProgressionTracker();
+    const {progressions, progress} = tracker;
     const accordionId = "weeklyProgressionAccordion";
     const items = [];
     for (const progression of progressions) {
@@ -102,16 +101,12 @@ function WeeklyProgressionInternal({className, onEdit}) {
                 milestonesCompleted++;
             }
         }
-        const onMilestoneCheckpointToggle = (milestoneIndex, checkpoint) => saveProgressWithMilestoneCheckpointToggled(
-            progress,
-            setProgress,
+        const onMilestoneCheckpointToggle = (milestoneIndex, checkpoint) => tracker.saveProgressWithMilestoneCheckpointToggled(
             progression.name,
             milestoneIndex,
             checkpoint
         );
-        const onGoToMilestone = (milestoneIndex) => saveProgressStartingWithMilestone(
-            progress,
-            setProgress,
+        const onGoToMilestone = (milestoneIndex) => tracker.saveProgressStartingWithMilestone(
             progression.name,
             milestoneIndex
         );
@@ -144,6 +139,38 @@ function WeeklyProgressionInternal({className, onEdit}) {
     </>;
 }
 
+function useProgressionTracker() {
+    const [progressions] = useState(() => loadProgressions());
+    const [progress, setProgress] = useState(() => loadProgress());
+    return {
+        progressions,
+        progress,
+        saveProgressWithMilestoneCheckpointToggled: function (progressionName, milestoneIndex, checkpoint) {
+            const newProgress = produce(progress, p => {
+                const checkpoints = p[progressionName][milestoneIndex];
+                const i = checkpoints.indexOf(checkpoint);
+                if (i > -1) {
+                    checkpoints.splice(i, 1);
+                } else {
+                    checkpoints.push(checkpoint);
+                }
+            });
+            setProgress(newProgress);
+            saveProgressInLocalStorage(newProgress);
+        },
+        saveProgressStartingWithMilestone: function (progressionName, milestoneIndex) {
+            const newProgress = produce(progress, p => {
+                const milestones = p[progressionName];
+                for (let i = milestoneIndex; i < milestones.length; i++) {
+                    milestones[i] = [];
+                }
+            });
+            setProgress(newProgress);
+            saveProgressInLocalStorage(newProgress);
+        }
+    };
+}
+
 function loadProgress() {
     let progress = localStorage.getItem(LOCAL_STORAGE_WEEKLY_PROGRESSION_PROGRESS);
     if (progress) {
@@ -165,46 +192,6 @@ function loadProgress() {
     progress = initProgressForProgressions(progressions);
     saveProgressInLocalStorage(progress);
     return progress;
-}
-
-function saveProgressWithMilestoneCheckpointToggled(
-    progress,
-    setProgress,
-    targetProgressionName,
-    targetMilestoneIndex,
-    targetCheckpointName
-) {
-    const newProgress = produce(progress, p => {
-        const checkpoints = p[targetProgressionName][targetMilestoneIndex];
-        const i = checkpoints.indexOf(targetCheckpointName);
-        if (i > -1) {
-            checkpoints.splice(i, 1);
-        } else {
-            checkpoints.push(targetCheckpointName);
-        }
-    });
-    setProgress(newProgress);
-    saveProgressInLocalStorage(newProgress);
-}
-
-function saveProgressStartingWithMilestone(
-    progress,
-    setProgress,
-    targetProgressionName,
-    targetMilestoneIndex
-) {
-    const newProgress = produce(progress, p => {
-        const milestones = p[targetProgressionName];
-        for (let i = targetMilestoneIndex; i < milestones.length; i++) {
-            milestones[i] = [];
-        }
-    });
-    setProgress(newProgress);
-    saveProgressInLocalStorage(newProgress);
-}
-
-function saveProgressInLocalStorage(progress) {
-    localStorage.setItem(LOCAL_STORAGE_WEEKLY_PROGRESSION_PROGRESS, JSON.stringify({progress, timestamp: Date.now()}));
 }
 
 function ProgressionPath({milestones, progress, onMilestoneCheckpointToggle, onGoToMilestone}) {
@@ -605,6 +592,10 @@ function loadProgressions() {
         progressions = localStorage.getItem(LOCAL_STORAGE_WEEKLY_PROGRESSION);
     }
     return JSON.parse(progressions);
+}
+
+function saveProgressInLocalStorage(progress) {
+    localStorage.setItem(LOCAL_STORAGE_WEEKLY_PROGRESSION_PROGRESS, JSON.stringify({progress, timestamp: Date.now()}));
 }
 
 function saveProgressionsInLocalStorage(progressions) {
