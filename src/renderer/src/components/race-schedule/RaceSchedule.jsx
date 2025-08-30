@@ -3,9 +3,13 @@ import "./RaceSchedule.scss"
 import TracksACC from "./TracksACC";
 import TracksLMU from "./TracksLMU";
 import TracksRF2 from "./TracksRF2";
+import TracksAMS2IMSA from "./TracksAMS2IMSA";
+import TracksAMS2IndyCar from "./TracksAMS2IndyCar";
 import ACCLogo from "../../assets/race-sim-logos/acc.png";
 import LMULogo from "../../assets/race-sim-logos/lmu.png";
 import RF2Logo from "../../assets/race-sim-logos/rf2.png";
+import AMS2IMSALogo from "../../assets/race-sim-logos/ams2-imsa.png";
+import AMS2IndyCarLogo from "../../assets/race-sim-logos/ams2-indycar.png";
 import seedrandom from "seedrandom";
 
 function pickRandomTrack(tracks) {
@@ -47,9 +51,11 @@ function Race({raceSimLogo, tracks}) {
 }
 
 export default function RaceSchedule({className}) {
-    return <div className={`row row-cols-3 g-4 ${className || ""}`}>
+    return <div className={`row row-cols-4 g-4 ${className || ""}`}>
         <Race raceSimLogo={LMULogo} tracks={TracksLMU}/>
-        <Race raceSimLogo={RF2Logo} tracks={TracksRF2}/>
         <Race raceSimLogo={ACCLogo} tracks={TracksACC}/>
+        <Race raceSimLogo={AMS2IMSALogo} tracks={TracksAMS2IMSA}/>
+        <Race raceSimLogo={AMS2IndyCarLogo} tracks={TracksAMS2IndyCar}/>
+        <Race raceSimLogo={RF2Logo} tracks={TracksRF2}/>
     </div>;
 }
