@@ -1,4 +1,4 @@
-import {parse} from "node-html-parser";
+import {JSDOM} from "jsdom";
 
 async function fetchLMURF2RaceSchedules() {
     try {
@@ -6,20 +6,20 @@ async function fetchLMURF2RaceSchedules() {
         const url = "https://www.racecontrol.gg";
         const res = await fetch(url);
         const raw = await res.text();
-        const html = parse(raw);
-        for (const section of html.querySelectorAll("body div.container section")) {
-            if ("Upcoming Daily Races" !== section.querySelector("div h3")?.innerHTML) {
+        const dom = new JSDOM(raw);
+        for (const section of dom.window.document.querySelectorAll("body div.container section")) {
+            if ("Upcoming Daily Races" !== section.querySelector(":scope > div h2")?.innerHTML) {
                 continue;
             }
             const gameSchedule = {
-                logoImageUrl: url + section.querySelector("div div img").getAttribute("src"),
+                logoImageUrl: url + section.querySelector(":scope > div div img").getAttribute("src"),
                 races: [],
             };
             for (const card of section.querySelectorAll("div.scheduled-race-card")) {
-                const raceHeaders = card.querySelectorAll("div.race-info div.race_header span");
+                const raceHeaders = card.querySelectorAll("div.race-info div.race-header span");
                 gameSchedule.races.push({
                     name: card.querySelector("div.race-info h4").innerHTML.trim(),
-                    logoImageUrl: card.querySelector("div a img").getAttribute("src"),
+                    logoImageUrl: card.querySelector(":scope > div a img").getAttribute("src"),
                     trackName: raceHeaders[raceHeaders.length - 1].innerHTML.trim()
                 });
             }
