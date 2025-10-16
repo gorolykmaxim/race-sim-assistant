@@ -31,7 +31,7 @@ export default [
     },
     {
         name: "Long Beach",
-        thumbnail: new URL("../../assets/track-thumbnails/ams2/Long Beach.jpg", import.meta.url).href,
+        thumbnail: new URL("../../assets/track-thumbnails/ams2/Long Beach.png", import.meta.url).href,
         layouts: ["Default"],
     },
     {
